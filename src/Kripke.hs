@@ -16,12 +16,32 @@ data Prop where
   Not :: Prop -> Prop
   Impl :: Prop -> Prop -> Prop
 
+needsParens :: Prop -> Bool
+needsParens (Var _) = False
+needsParens _       = True
+
 instance Show Prop where
-  show (Var s) = s
-  show (Or p q) = "(" ++ show p ++ ") ∨ (" ++ show q ++ ")"
-  show (And p q) = "(" ++ show p ++ ") ∧ (" ++ show q ++ ")"
-  show (Not p) = "¬(" ++ show p ++ ")"
-  show (Impl p q) = "(" ++ show p ++ " -> " ++ show q ++ ")"
+  show :: Prop -> String
+  show (Var s)
+    | otherwise = s
+  show (Or p q)
+    | needsParens p && needsParens q = "(" ++ show p ++ ") ∨ (" ++ show q ++ ")"
+    | needsParens p = "(" ++ show p ++ ") ∨ " ++ show q
+    | needsParens q = show p ++ "∨ (" ++ show q ++ ")"
+    | otherwise     = show p ++ " ∨ " ++ show q
+  show (And p q)
+    | needsParens p && needsParens q = "(" ++ show p ++ ") ∧ (" ++ show q ++ ")"
+    | needsParens p = "(" ++ show p ++ ") ∧ " ++ show q
+    | needsParens q = show p ++ "∧ (" ++ show q ++ ")"
+    | otherwise     = show p ++ " ∧ " ++ show q
+  show (Not p)
+    | needsParens p = "¬(" ++ show p ++ ")"
+    | otherwise     = "¬ " ++ show p
+  show (Impl p q) 
+    | needsParens p && needsParens q = "(" ++ show p ++ ") -> (" ++ show q ++ ")"
+    | needsParens p = "(" ++ show p ++ ") -> " ++ show q
+    | needsParens q = show p ++ "-> (" ++ show q ++ ")"
+    | otherwise     = show p ++ show q
 
 isVar :: Prop -> Bool
 isVar (Var _) = True
