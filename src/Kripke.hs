@@ -106,3 +106,7 @@ addToModel km (Right ot) = addOrd km ot
 -- This is particularly lazy, but it is also fast to write.
 processFile :: String -> KripkeModel
 processFile = foldl' addToModel emptyModel . map readLine . lines
+
+loadKripkeModel :: String -> IO KripkeModel
+loadKripkeModel s = processFile <$> readFile s
+
